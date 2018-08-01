@@ -1,0 +1,42 @@
+! Configuration File for keepalived
+global_defs {
+  router_id {{ inventory_hostname }}
+}
+
+vrrp_instance {{ vrrp_instance.name }} {
+  state MASTER
+  interface {{ vrrp_instance.interface }}
+  mcast_src_ip {{ ansible_default_ipv4.address }}
+  virtual_router_id {{ vrrp_instance.virtual_ipaddress.split(".")[3] }}
+  priority {{ ansible_default_ipv4.address.split(".")[3] }}
+  advert_int 1
+  authentication {
+    auth_type PASS
+    auth_pass {{ vrrp_instance.auth_pass }}
+  }
+  virtual_ipaddress {
+      {{ vrrp_instance.virtual_ipaddress }}
+  }
+  notify_master "/etc/keepalived/notifier.sh {{ vrrp_instance.virtual_ipaddress }} master"
+  notify_backup "/etc/keepalived/notifier.sh {{ vrrp_instance.virtual_ipaddress }} backup"
+  notify_fault "/etc/keepalived/notifier.sh {{ vrrp_instance.virtual_ipaddress }} fault"
+}
+
+virtual_server {{ virtual_server.ip_address | urlsplit('hostname') }} {{ virtual_server.ip_address | urlsplit('port') }} {
+  delay_loop 6        # period of time for checking
+  lb_algo rr         # load balancing algorithm (rr, wrr, al wlc,...etc)
+  lb_kind DR           # forwarding (dr, nat, tun)
+  persistence_timeout # time for persistent connection
+  protocol TCP
+  
+  {% for addr in real_server.ip_addresses %}
+  {% set ip = addr.split(':')[0] %}
+  {% set port = addr.split(':')[1] %}
+  real_server {{ addr.replace(':', ' ') }} {
+    MISC_CHECK {
+      misc_path "/etc/keepalived/mariadb_chk.sh -h{{ ip }} -P{{ port }} -uhealth_check -phealth_check"
+      misc_timeout 10
+    }
+  }
+  {% endfor %}
+}

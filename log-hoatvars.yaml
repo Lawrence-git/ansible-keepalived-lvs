@@ -1,0 +1,14 @@
+# Setup dependencies
+
+---
+- hosts: all
+  tasks:
+    - name: 'log'
+      vars:
+        group: "{{ group_names[0] }}"
+        msg: "{{ groups[group] }}"
+      debug:
+        # msg: "{{ group }}"
+        msg: "{{ msg }}"
+        # msg: "{{ msg.splice('\n') }}"
+  

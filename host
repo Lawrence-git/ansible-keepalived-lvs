@@ -1,0 +1,10 @@
+
+PLAY [all] *************************************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************
+fatal: [somin]: FAILED! => {"changed": false, "module_stderr": "Shared connection to 10.78.22.30 closed.\r\n", "module_stdout": "sudo: a password is required\r\n", "msg": "MODULE FAILURE", "rc": 1}
+	to retry, use: --limit @/vagrant/ansible/keepalived+lvs/log-hoatvars.retry
+
+PLAY RECAP *************************************************************************************************************************************************************
+somin                      : ok=0    changed=0    unreachable=0    failed=1   
+

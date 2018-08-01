@@ -1,0 +1,16 @@
+---
+- name: 'show templating'
+  vars:
+    vrrp_instance:
+      name: mariadb
+      interface: eth0
+      virtual_ipaddress: 10.78.26.76
+      auth_pass: 1234568
+    virtual_server:
+      ip_address: "10.78.26.76"
+    real_server:
+      ip_addresses:
+        - "10.78.26.73:3306"
+        - "10.78.26.74:3306"
+        - "10.78.26.75:3306"
+  debug: msg="{{ lookup('template', 'keepalived.conf.j2').split('\n') }}"

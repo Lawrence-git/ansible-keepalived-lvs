@@ -1,0 +1,11 @@
+# Setup dependencies
+
+---
+- hosts: all
+  # remote_user: root
+  sudo: yes
+  # sudo_user: name
+  tasks:
+    # - include: template-test.yaml
+    - include: install-keepalived.yaml state=present
+    

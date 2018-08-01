@@ -1,0 +1,26 @@
+---
+- name: 'adding cloud archive repository'
+  apt_repository:
+    repo: "deb http://ubuntu-cloud.archive.canonical.com/ubuntu xenial-updates/queens main"
+    state: "{{ state }}"
+
+- name: 'installing keepalived v1.3.9'
+  when: ansible_os_family == "Debian"
+  apt: name="keepalived=1:1.3.9-1build1~cloud0" state="{{ state }}"
+
+- name: making keepalived.conf
+  template: src=./../templates/keepalived.conf.j2 dest=/etc/keepalived/keepalived.conf
+  notify: restart keepalived
+  
+- name: 'copy files'
+  copy:
+    src: "./files/{{ item }}"
+    dest: "/etc/keepalived/{{ item }}"
+    owner: root
+    group: root
+    mode: "u=r,g=r,o=rx"
+  with_items:
+    - "iptables.sh"
+    - "mariadb_chk.sh"
+    - "notifier.sh"
+  notify: restart keepalived
